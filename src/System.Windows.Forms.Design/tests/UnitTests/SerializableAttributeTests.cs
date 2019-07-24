@@ -23,7 +23,6 @@ namespace System.Windows.Forms.Design.Tests.Serialization
                     { typeof(ExceptionCollection).FullName},
                     { "System.ComponentModel.Design.Serialization.CodeDomComponentSerializationService+CodeDomSerializationStore"}, // This type is private.
                     { typeof(CodeDomSerializerException).FullName},
-                    { typeof(ToolboxItem).FullName},
                     { "System.Windows.Forms.Design.Behavior.DesignerActionKeyboardBehavior+<>c"}
                 });
         }

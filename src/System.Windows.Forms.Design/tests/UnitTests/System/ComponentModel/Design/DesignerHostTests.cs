@@ -1797,7 +1797,7 @@ namespace System.ComponentModel.Design.Tests
             Assert.False(host.Loading);
         }
 
-        [Fact]
+        [Fact(Skip = "https://github.com/dotnet/winforms/issues/1460")]
         public void DesignerHost_Add_ComponentDisposeThrowsDuringUnloadingDispose_ThrowsInvalidOperationException()
         {
             var surface = new SubDesignSurface();
