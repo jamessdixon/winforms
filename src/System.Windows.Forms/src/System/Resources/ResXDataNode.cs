@@ -20,7 +20,7 @@ using System.Xml;
 
 namespace System.Resources
 {
-    [Serializable]
+    [Serializable] // This type is participating in resx serialization scenarios.
     public sealed class ResXDataNode : ISerializable
     {
         private static readonly char[] SpecialChars = new char[] { ' ', '\r', '\n' };
@@ -30,7 +30,8 @@ namespace System.Resources
         private string name;
         private string comment;
 
-        private string typeName; // is only used when we create a resxdatanode manually with an object and contains the FQN
+        // is only used when we create a resxdatanode manually with an object and contains the FQN
+        private string typeName; 
 
         private string fileRefFullPath;
         private string fileRefType;
@@ -743,22 +744,22 @@ namespace System.Resources
         void ISerializable.GetObjectData(SerializationInfo si, StreamingContext context)
         {
             DataNodeInfo nodeInfo = GetDataNodeInfo();
-            si.AddValue("Name", nodeInfo.Name, typeof(string));
-            si.AddValue("Comment", nodeInfo.Comment, typeof(string));
-            si.AddValue("TypeName", nodeInfo.TypeName, typeof(string));
-            si.AddValue("MimeType", nodeInfo.MimeType, typeof(string));
-            si.AddValue("ValueData", nodeInfo.ValueData, typeof(string));
+            si.AddValue(nameof(DataNodeInfo.Name), nodeInfo.Name, typeof(string));
+            si.AddValue(nameof(DataNodeInfo.Comment), nodeInfo.Comment, typeof(string));
+            si.AddValue(nameof(DataNodeInfo.TypeName), nodeInfo.TypeName, typeof(string));
+            si.AddValue(nameof(DataNodeInfo.MimeType), nodeInfo.MimeType, typeof(string));
+            si.AddValue(nameof(DataNodeInfo.ValueData), nodeInfo.ValueData, typeof(string));
         }
 
         private ResXDataNode(SerializationInfo info, StreamingContext context)
         {
             nodeInfo = new DataNodeInfo
             {
-                Name = (string)info.GetValue("Name", typeof(string)),
-                Comment = (string)info.GetValue("Comment", typeof(string)),
-                TypeName = (string)info.GetValue("TypeName", typeof(string)),
-                MimeType = (string)info.GetValue("MimeType", typeof(string)),
-                ValueData = (string)info.GetValue("ValueData", typeof(string))
+                Name = (string)info.GetValue(nameof(DataNodeInfo.Name), typeof(string)),
+                Comment = (string)info.GetValue(nameof(DataNodeInfo.Comment), typeof(string)),
+                TypeName = (string)info.GetValue(nameof(DataNodeInfo.TypeName), typeof(string)),
+                MimeType = (string)info.GetValue(nameof(DataNodeInfo.MimeType), typeof(string)),
+                ValueData = (string)info.GetValue(nameof(DataNodeInfo.ValueData), typeof(string))
             };
             InitializeDataNode(null);
         }
@@ -766,11 +767,13 @@ namespace System.Resources
 
     internal class DataNodeInfo
     {
-        internal string Name;
-        internal string Comment;
-        internal string TypeName;
-        internal string MimeType;
-        internal string ValueData;
+#pragma warning disable IDE1006
+        internal string Name; // Do NOT rename (binary serialization).
+        internal string Comment; // Do NOT rename (binary serialization).
+        internal string TypeName; // Do NOT rename (binary serialization).
+        internal string MimeType; // Do NOT rename (binary serialization).
+        internal string ValueData; // Do NOT rename (binary serialization).
+#pragma warning restore IDE1006
         internal Point ReaderPosition; //only used to track position in the reader
 
         internal DataNodeInfo Clone()

@@ -7,22 +7,24 @@ using System.Runtime.Serialization;
 
 namespace System.ComponentModel.Design
 {
-    [Serializable]
+    [Serializable]  // Exceptions should exchange successfully between the classic and Core frameworks.
     public sealed class ExceptionCollection : Exception
     {
-        private readonly ArrayList _exceptions;
+#pragma warning disable IDE1006
+        private readonly ArrayList exceptions; // Do NOT rename (binary serialization).
+#pragma warning restore IDE1006
 
         public ExceptionCollection(ArrayList exceptions)
         {
-            _exceptions = exceptions;
+            this.exceptions = exceptions;
         }
 
         private ExceptionCollection(SerializationInfo info, StreamingContext context) : base(info, context)
         {
-            _exceptions = (ArrayList)info.GetValue("exceptions", typeof(ArrayList));
+            exceptions = (ArrayList)info.GetValue(nameof(exceptions), typeof(ArrayList));
         }
 
-        public ArrayList Exceptions => (ArrayList)_exceptions?.Clone();
+        public ArrayList Exceptions => (ArrayList)exceptions?.Clone();
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
@@ -31,7 +33,7 @@ namespace System.ComponentModel.Design
                 throw new ArgumentNullException(nameof(info));
             }
 
-            info.AddValue("exceptions", _exceptions);
+            info.AddValue(nameof(exceptions), exceptions);
             base.GetObjectData(info, context);
         }
     }

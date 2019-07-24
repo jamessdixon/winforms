@@ -18,17 +18,18 @@ namespace System.Windows.Forms
     ///  Different cursor shapes are used to inform the user what operation the mouse will
     ///  have.
     /// </summary>
-    [TypeConverter(typeof(CursorConverter)),
-        Serializable,
-        Editor("System.Drawing.Design.CursorEditor, " + AssemblyRef.SystemDrawingDesign, typeof(UITypeEditor))]
+    [TypeConverter(typeof(CursorConverter))]
+    [Serializable]  // This class participates in resx serialization.
+    [Editor("System.Drawing.Design.CursorEditor, " + AssemblyRef.SystemDrawingDesign, typeof(UITypeEditor))]
     public sealed class Cursor : IDisposable, ISerializable
     {
         private static Size cursorSize = System.Drawing.Size.Empty;
-
-        private readonly byte[] cursorData;
+#pragma warning disable IDE1006
+        private readonly byte[] CursorData;// Do NOT rename (binary serialization).
+        private int CursorResourceId = 0;// Do NOT rename (binary serialization).
+#pragma warning restore IDE1006
         private IntPtr handle = IntPtr.Zero;       // handle to loaded image
         private bool ownHandle = true;
-        private int resourceId = 0;
 
         private object userData;
 
@@ -45,15 +46,15 @@ namespace System.Windows.Forms
             for (; sie.MoveNext();)
             {
                 // Dont catch any exceptions while Deserialising objects from stream.
-                if (string.Equals(sie.Name, "CursorData", StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(sie.Name, nameof(CursorData), StringComparison.OrdinalIgnoreCase))
                 {
-                    cursorData = (byte[])sie.Value;
-                    if (cursorData != null)
+                    CursorData = (byte[])sie.Value;
+                    if (CursorData != null)
                     {
-                        LoadPicture(new UnsafeNativeMethods.ComStreamFromDataStream(new MemoryStream(cursorData)));
+                        LoadPicture(new UnsafeNativeMethods.ComStreamFromDataStream(new MemoryStream(CursorData)));
                     }
                 }
-                else if (string.Compare(sie.Name, "CursorResourceId", true, CultureInfo.InvariantCulture) == 0)
+                else if (string.Compare(sie.Name, nameof(CursorResourceId), true, CultureInfo.InvariantCulture) == 0)
                 {
                     LoadFromResourceId((int)sie.Value);
                 }
@@ -81,9 +82,9 @@ namespace System.Windows.Forms
         {
             Stream stream = typeof(Cursor).Module.Assembly.GetManifestResourceStream(typeof(Cursor), resource);
             Debug.Assert(stream != null, "couldn't get stream for resource " + resource);
-            cursorData = new byte[stream.Length];
-            stream.Read(cursorData, 0, Convert.ToInt32(stream.Length)); // we assume that a cursor is less than 4gig big
-            LoadPicture(new UnsafeNativeMethods.ComStreamFromDataStream(new MemoryStream(cursorData)));
+            CursorData = new byte[stream.Length];
+            stream.Read(CursorData, 0, Convert.ToInt32(stream.Length)); // we assume that a cursor is less than 4gig big
+            LoadPicture(new UnsafeNativeMethods.ComStreamFromDataStream(new MemoryStream(CursorData)));
         }
 
         /// <summary>
@@ -112,14 +113,14 @@ namespace System.Windows.Forms
             FileStream f = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
             try
             {
-                cursorData = new byte[f.Length];
-                f.Read(cursorData, 0, Convert.ToInt32(f.Length)); // assume that a cursor is less than 4gig...
+                CursorData = new byte[f.Length];
+                f.Read(CursorData, 0, Convert.ToInt32(f.Length)); // assume that a cursor is less than 4gig...
             }
             finally
             {
                 f.Close();
             }
-            LoadPicture(new UnsafeNativeMethods.ComStreamFromDataStream(new MemoryStream(cursorData)));
+            LoadPicture(new UnsafeNativeMethods.ComStreamFromDataStream(new MemoryStream(CursorData)));
         }
 
         /// <summary>
@@ -135,9 +136,9 @@ namespace System.Windows.Forms
         /// </summary>
         public Cursor(Stream stream)
         {
-            cursorData = new byte[stream.Length];
-            stream.Read(cursorData, 0, Convert.ToInt32(stream.Length));// assume that a cursor is less than 4gig...
-            LoadPicture(new UnsafeNativeMethods.ComStreamFromDataStream(new MemoryStream(cursorData)));
+            CursorData = new byte[stream.Length];
+            stream.Read(CursorData, 0, Convert.ToInt32(stream.Length));// assume that a cursor is less than 4gig...
+            LoadPicture(new UnsafeNativeMethods.ComStreamFromDataStream(new MemoryStream(CursorData)));
         }
 
         /// <summary>
@@ -529,13 +530,13 @@ namespace System.Windows.Forms
         /// </summary>
         void ISerializable.GetObjectData(SerializationInfo si, StreamingContext context)
         {
-            if (cursorData != null)
+            if (CursorData != null)
             {
-                si.AddValue("CursorData", cursorData, typeof(byte[]));
+                si.AddValue(nameof(CursorData), CursorData, typeof(byte[]));
             }
-            else if (resourceId != 0)
+            else if (CursorResourceId != 0)
             {
-                si.AddValue("CursorResourceId", resourceId, typeof(int));
+                si.AddValue(nameof(CursorResourceId), CursorResourceId, typeof(int));
             }
             else
             {
@@ -563,7 +564,7 @@ namespace System.Windows.Forms
             //
             try
             {
-                resourceId = nResourceId;
+                CursorResourceId = nResourceId;
                 handle = SafeNativeMethods.LoadCursor(NativeMethods.NullHandleRef, nResourceId);
             }
             catch (Exception e)
@@ -671,13 +672,13 @@ namespace System.Windows.Forms
             {
                 throw new ArgumentNullException(nameof(stream));
             }
-            if (resourceId != 0)
+            if (CursorResourceId != 0)
             {
                 throw new FormatException(SR.CursorCannotCovertToBytes);
             }
             try
             {
-                stream.Write(cursorData, 0, cursorData.Length);
+                stream.Write(CursorData, 0, CursorData.Length);
             }
             catch (Security.SecurityException)
             {
