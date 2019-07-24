@@ -232,7 +232,7 @@ namespace System.ComponentModel.Design.Serialization
         /// that Dispose  simply calls the Close method.  Dispose is implemented as a private interface to avoid confusion.
         /// The <see cref="IDisposable" /> pattern is provided for languages that support a "using" syntax like C# and VB .NET.
         /// </summary>
-        [Serializable] // This class is stored in binary serializad format during CodeDOM serialization scenarios.
+        [Serializable] // This class is stored in binary serialized format during CodeDOM serialization scenarios.
         private sealed class CodeDomSerializationStore : SerializationStore, ISerializable
         {
 #if DEBUG

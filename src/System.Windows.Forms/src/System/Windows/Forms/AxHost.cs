@@ -6961,9 +6961,7 @@ namespace System.Windows.Forms
         ///  AxHost object, or by reading in from a stream.
         /// </summary>
         [TypeConverterAttribute(typeof(TypeConverter))]
-        [Serializable] // This class participates in resx serialization.
-        // Note: This class implements ISerializable and uses hardcoded strings to store member data. 
-        // It is safe to change member names, but not the serialization key values.
+        [Serializable] // This exchanges with the native code.
         public class State : ISerializable
         {
             private readonly int VERSION = 1;

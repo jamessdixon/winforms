@@ -298,6 +298,7 @@ namespace System.Windows.Forms.Tests.Serialization
             Assert.True(result.IsStub); // This class is not associated with an owner control.
             Assert.Equal(TableLayoutPanelCellBorderStyle.None, result.CellBorderStyle); // This property is not serialized.
             Assert.NotNull(result.LayoutEngine);
+            // These values will be accessible when the owner is set.
             Assert.Throws<NullReferenceException>(() => result.CellBorderWidth);
             Assert.Throws<NullReferenceException>(() => result.ColumnCount);
             Assert.Throws<NullReferenceException>(() => result.GrowStyle);

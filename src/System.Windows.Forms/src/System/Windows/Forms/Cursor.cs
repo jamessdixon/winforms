@@ -25,8 +25,8 @@ namespace System.Windows.Forms
     {
         private static Size cursorSize = System.Drawing.Size.Empty;
 #pragma warning disable IDE1006
-        private readonly byte[] CursorData;// Do NOT rename (binary serialization).
-        private int CursorResourceId = 0;// Do NOT rename (binary serialization).
+        private readonly byte[] CursorData; // Do NOT rename (binary serialization).
+        private int CursorResourceId = 0; // Do NOT rename (binary serialization).
 #pragma warning restore IDE1006
         private IntPtr handle = IntPtr.Zero;       // handle to loaded image
         private bool ownHandle = true;
